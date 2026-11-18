@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Galerie-Skript ###
+tools/prepare-gallery/node_modules/

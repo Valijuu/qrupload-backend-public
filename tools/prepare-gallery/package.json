@@ -1,0 +1,21 @@
+{
+  "name": "prepare-gallery",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Erzeugt Thumbnails, Handy-Versionen, ZIP-Pakete und index.json fuer die Hochzeitsgalerie und laedt sie per rclone in den Bucket.",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "prepare-gallery": "node src/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "sharp": "0.35.5",
+    "yazl": "3.3.1"
+  },
+  "devDependencies": {
+    "yauzl": "3.4.0"
+  }
+}

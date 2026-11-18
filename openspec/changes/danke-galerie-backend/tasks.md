@@ -20,14 +20,14 @@
 
 ## 4. Skript
 
-- [ ] 4.1 `tools/prepare-gallery`: Vorschau (400 px) und Handy-Version (2560 px, Qualität 85) mit EXIF-Ausrichtung, mit Tests an Beispielbildern
-- [ ] 4.2 ZIP-Pakete (ca. 1 GB, Reihenfolge) und Handy-ZIP sowie `index.json`, mit Tests der Aufteilung
-- [ ] 4.3 Upload per `rclone` und Wiederholbarkeit ohne doppelte Arbeit, mit Test auf einem Probeordner; Verifikation: zweiter Lauf erzeugt nichts neu
+- [x] 4.1 `tools/prepare-gallery`: Vorschau (400 px) und Handy-Version (2560 px, Qualität 85) mit EXIF-Ausrichtung, mit Tests an Beispielbildern
+- [x] 4.2 ZIP-Pakete (ca. 1 GB, Reihenfolge) und Handy-ZIP sowie `index.json`, mit Tests der Aufteilung
+- [x] 4.3 Upload per `rclone` und Wiederholbarkeit ohne doppelte Arbeit, mit Test auf einem Probeordner; Verifikation: zweiter Lauf erzeugt nichts neu
 
 ## 5. Betrieb
 
-- [ ] 5.1 Dockerfile und Cloud-Run-Konfiguration (Secrets `JWT_SECRET`, `GALLERY_PASSWORD`, R2-Zugangsdaten, `max-instances` 2); Verifikation: Container startet lokal mit Beispielwerten
-- [ ] 5.2 README und `CHANGELOG.md` aktualisieren; Verifikation: README beschreibt Variablen, Skript und Deployment
+- [x] 5.1 Dockerfile und Cloud-Run-Konfiguration (Secrets `JWT_SECRET`, `GALLERY_PASSWORD`, R2-Zugangsdaten, `max-instances` 2); Verifikation: Container startet lokal mit Beispielwerten
+- [x] 5.2 README und `CHANGELOG.md` aktualisieren; Verifikation: README beschreibt Variablen, Skript und Deployment
 - [ ] 5.3 Ende-zu-Ende-Prüfung mit dem Frontend (Login, Liste, Vorschau, Download) gegen einen Test-Bucket
 
 ## Workflow follow-up

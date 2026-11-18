@@ -35,3 +35,8 @@ dependencies {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+// Feste Dateiname, damit das Dockerfile nicht von der Version abhaengt
+tasks.bootJar {
+	archiveFileName.set("app.jar")
+}
