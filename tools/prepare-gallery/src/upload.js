@@ -8,6 +8,9 @@ const RCLONE_BINARY = 'rclone';
 const RCLONE_COPY = 'copy';
 const RCLONE_COPY_FILE = 'copyto';
 const RCLONE_PROGRESS_FLAG = '--progress';
+// Object-Tokens (nur Lesen/Schreiben im Bucket) duerfen keinen Bucket anlegen; ohne diese Option
+// versucht rclone das vor jedem Upload und scheitert mit 403
+const NO_BUCKET_CHECK_FLAG = '--s3-no-check-bucket';
 const CREDENTIAL_MARKERS = ['://', '@'];
 const SUCCESS_EXIT_CODE = 0;
 // Nur diese Ergebnisse gehoeren in den Bucket: keine Zwischenstaende (*.part), Hilfsdateien (*.manifest)
@@ -24,12 +27,13 @@ export function rcloneCommands({ inputDir, outDir, remote }) {
   if (CREDENTIAL_MARKERS.some((marker) => remote.includes(marker))) {
     throw new Error('Remote darf keine Zugangsdaten enthalten, sie gehoeren in die rclone-Konfiguration');
   }
-  return [
+  const commands = [
     [RCLONE_COPY, inputDir, `${remote}/${ORIGINALS_FOLDER}`,
       '--max-depth', '1', '--ignore-case', '--include', `*.{${IMAGE_EXTENSION_NAMES.join(',')}}`],
     [RCLONE_COPY, outDir, remote, ...RESULT_PATTERNS.flatMap((pattern) => ['--include', pattern])],
     [RCLONE_COPY_FILE, path.join(outDir, INDEX_FILE), `${remote}/${INDEX_FILE}`],
   ];
+  return commands.map((command) => [...command, NO_BUCKET_CHECK_FLAG]);
 }
 
 export async function runRclone(commands) {

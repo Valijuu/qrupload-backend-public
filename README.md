@@ -47,10 +47,17 @@ Das Skript `tools/prepare-gallery` (Node 20+) erzeugt Vorschaubilder (400 px), H
 ```bash
 cd tools/prepare-gallery
 npm ci
-node src/cli.js /pfad/zu/den/fotos /pfad/zum/ausgabeordner --remote r2:hochzeit
+node src/cli.js /pfad/zu/den/fotos /pfad/zum/ausgabeordner --remote r2:wedding
 ```
 
-`--remote` ist ein rclone-Remote (`rclone config`, die Zugangsdaten stehen in der rclone-Konfiguration, nicht im Repo). Ohne `--remote` wird nur lokal erzeugt. Im Bucket entsteht `originals/`, `thumbs/`, `mobile/`, `zips/` und `index.json`.
+`--remote` ist ein rclone-Remote (`rclone config`, die Zugangsdaten stehen in der rclone-Konfiguration, nicht im Repo). Einrichtung: Storage `s3`, Provider `Cloudflare`, `env_auth` `false`, Access Key ID und Secret eines R2-Tokens mit **Object Read & Write** auf den Bucket, Endpoint `https://<konto-id>.r2.cloudflarestorage.com`, Region leer. Das Skript übergibt `--s3-no-check-bucket`, weil ein Object-Token keinen Bucket anlegen darf und rclone es sonst vor jedem Upload versucht (Fehler 403).
+
+Einrichtung prüfen (liest, schreibt eine Testdatei nach `_rights-check/` und löscht sie wieder):
+
+```bash
+tools/r2-check/check-r2.sh            # Standard: Remote r2, Bucket wedding
+tools/r2-check/check-r2.sh r2 <bucket>
+``` Ohne `--remote` wird nur lokal erzeugt. Im Bucket entsteht `originals/`, `thumbs/`, `mobile/`, `zips/` und `index.json`.
 
 ## Betrieb auf Cloud Run
 

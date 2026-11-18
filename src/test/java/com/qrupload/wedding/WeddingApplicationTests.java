@@ -11,7 +11,7 @@ import static com.qrupload.wedding.support.TestValues.PASSWORD;
         "jwt.secret=" + JWT_SECRET,
         "gallery.password=" + PASSWORD,
         "gallery.storage.endpoint=https://konto.r2.cloudflarestorage.com",
-        "gallery.storage.bucket=hochzeit",
+        "gallery.storage.bucket=wedding",
         "gallery.storage.access-key=AKIDEXAMPLE",
         "gallery.storage.secret-key=beispiel-secret"
 })

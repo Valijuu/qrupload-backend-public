@@ -15,7 +15,7 @@ class R2GalleryStorageTest {
     private static final String KEY = "thumbs/0001.jpg";
 
     private final R2GalleryStorage storage = new R2GalleryStorage(new R2Properties(
-            "https://konto.r2.cloudflarestorage.com", "hochzeit", "AKIDEXAMPLE", "geheimes-secret-beispiel"));
+            "https://konto.r2.cloudflarestorage.com", "wedding", "AKIDEXAMPLE", "geheimes-secret-beispiel"));
 
     @Test
     void ansichtLinkEnthaeltObjektUndGueltigkeit() {
