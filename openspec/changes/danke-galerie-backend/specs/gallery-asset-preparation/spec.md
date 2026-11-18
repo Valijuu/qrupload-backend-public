@@ -33,6 +33,14 @@ Das Skript SHALL die Ergebnisse unter `originals/`, `thumbs/`, `mobile/` und `zi
 - **WHEN** das Skript mit denselben Fotos erneut gestartet wird
 - **THEN** werden keine Dateien doppelt erzeugt oder hochgeladen
 
+#### Scenario: Nur Bilder werden hochgeladen
+- **WHEN** im Fotoordner auch andere Dateien oder Unterordner liegen
+- **THEN** lädt das Skript nur die Bilddateien des Ordners hoch, ohne Zwischen- und Hilfsdateien
+
+#### Scenario: index.json zuletzt
+- **WHEN** das Skript hochlädt
+- **THEN** lädt es `index.json` erst, nachdem alle Bilder und Pakete oben sind
+
 #### Scenario: Zugangsdaten
 - **WHEN** das Skript Zugangsdaten braucht
 - **THEN** liest es sie aus der Umgebung oder der rclone-Konfiguration und schreibt sie nicht in Dateien im Repo

@@ -3,6 +3,8 @@ package com.qrupload.wedding.gallery;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,5 +41,22 @@ class R2GalleryStorageTest {
         URI link = storage.presignView(KEY, FIVE_MINUTES);
 
         assertThat(link.toString()).doesNotContain("geheimes-secret-beispiel");
+    }
+
+    @Test
+    void dateinamenMitUmlautUndAnfuehrungszeichenWerdenKorrektKodiert() {
+        URI link = storage.presignDownload("originals/x.jpg", FIVE_MINUTES, "Müller \"x\".jpg");
+        String decoded = URLDecoder.decode(link.getRawQuery(), StandardCharsets.UTF_8);
+
+        assertThat(decoded)
+                .contains("filename*=UTF-8''M%C3%BCller%20%22x%22.jpg")
+                .doesNotContain("filename=\"Müller \"x\".jpg\"");
+    }
+
+    @Test
+    void zugangsdatenErscheinenNichtInToString() {
+        R2Properties properties = new R2Properties("https://e", "b", "AKIDEXAMPLE", "geheimes-secret-beispiel");
+
+        assertThat(properties.toString()).doesNotContain("geheimes-secret-beispiel").doesNotContain("AKIDEXAMPLE");
     }
 }

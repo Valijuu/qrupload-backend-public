@@ -2,7 +2,10 @@ import { createHash } from 'node:crypto';
 import { readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 
-const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff']);
+export const IMAGE_EXTENSION_NAMES = ['jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff'];
+const IMAGE_EXTENSIONS = new Set(IMAGE_EXTENSION_NAMES.map((name) => `.${name}`));
+// Natuerliche Reihenfolge: IMG_2 vor IMG_10
+const NATURAL_ORDER = new Intl.Collator('de', { numeric: true, sensitivity: 'variant' });
 const ID_LENGTH = 8;
 const HASH_ALGORITHM = 'sha256';
 const HASH_ENCODING = 'hex';
@@ -10,14 +13,27 @@ const HASH_ENCODING = 'hex';
 /** Bilddateien eines Ordners, nach Dateiname sortiert (das ist die Reihenfolge in der Galerie). */
 export async function listOriginals(dir) {
   const names = (await readdir(dir)).filter((name) => IMAGE_EXTENSIONS.has(path.extname(name).toLowerCase()));
-  names.sort();
+  names.sort(NATURAL_ORDER.compare);
   return Promise.all(names.map(async (name) => {
     const file = path.join(dir, name);
-    return { name, path: file, size: (await stat(file)).size };
+    const { size, mtimeMs } = await stat(file);
+    return { name, path: file, size, modified: mtimeMs };
   }));
 }
 
 /** Stabile, kurze Kennung aus dem Dateinamen: bleibt gleich, auch wenn spaeter Fotos dazukommen. */
 export function photoId(fileName) {
   return createHash(HASH_ALGORITHM).update(fileName).digest(HASH_ENCODING).slice(0, ID_LENGTH);
+}
+
+/** Zwei Fotos mit gleicher Kennung wuerden sich gegenseitig ueberschreiben: lieber abbrechen. */
+export function assertUniqueIds(photos) {
+  const seen = new Map();
+  for (const photo of photos) {
+    const earlier = seen.get(photo.id);
+    if (earlier) {
+      throw new Error(`Gleiche Kennung ${photo.id} fuer ${earlier} und ${photo.file}, bitte eine Datei umbenennen`);
+    }
+    seen.set(photo.id, photo.file);
+  }
 }

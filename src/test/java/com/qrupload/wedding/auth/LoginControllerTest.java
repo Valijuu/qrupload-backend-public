@@ -63,4 +63,12 @@ class LoginControllerTest {
                     .andExpect(status().isUnauthorized());
         }
     }
+
+    @Test
+    void kaputtesJsonLiefert400StattAbgelaufenerSitzung() throws Exception {
+        // Unerwartete Fehler duerfen nicht als 401 ankommen, sonst haelt das Frontend die Sitzung fuer abgelaufen
+        mockMvc.perform(post(LOGIN_PATH).header(FORWARDED_FOR_HEADER, "10.1.0.5")
+                        .contentType(MediaType.APPLICATION_JSON).content("{kaputt"))
+                .andExpect(status().isBadRequest());
+    }
 }

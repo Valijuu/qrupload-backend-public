@@ -83,6 +83,15 @@ class LoginRateLimitTest {
     }
 
     @Test
+    void erfolgreicheLoginsZaehlenNichtMit() throws Exception {
+        // Viele Gaeste hinter einem Hotel-WLAN oder Mobilfunk-NAT teilen sich eine IP
+        for (int i = 0; i < ALLOWED_ATTEMPTS * 2; i++) {
+            attempt("10.4.0.10", PASSWORD).andExpect(status().isNoContent());
+        }
+        attempt("10.4.0.10", WRONG_PASSWORD).andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void andereIpIstUnabhaengig() throws Exception {
         useUpAttempts("10.4.0.4");
         attempt("10.4.0.5", PASSWORD).andExpect(status().isNoContent());

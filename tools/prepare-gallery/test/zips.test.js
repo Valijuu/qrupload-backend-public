@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { test } from 'node:test';
 import yauzl from 'yauzl';
-import { buildZip, originalZipName, planOriginalZips } from '../src/zips.js';
+import { buildZip, mobileEntryNames, originalZipName, planOriginalZips } from '../src/zips.js';
 import { tempDir } from './helpers.js';
 
 const GB = 1_000_000_000;
@@ -52,4 +52,14 @@ test('buildZip packt die Dateien unter ihrem Namen', async () => {
   await buildZip([first, second], target);
 
   assert.deepEqual(await zipEntryNames(target), ['a.jpg', 'b.jpg']);
+});
+
+test('Handy-Fotos im ZIP heissen wie das Original, bei Doppelten mit Kennung', () => {
+  const names = mobileEntryNames([
+    { id: '11111111', file: 'hochzeit.jpg' },
+    { id: '22222222', file: 'hochzeit.png' },
+    { id: '33333333', file: 'feier.jpeg' },
+  ]);
+
+  assert.deepEqual(names, ['hochzeit.jpg', 'hochzeit-22222222.jpg', 'feier.jpg']);
 });

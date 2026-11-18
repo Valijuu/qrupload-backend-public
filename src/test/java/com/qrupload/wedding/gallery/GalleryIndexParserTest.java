@@ -31,4 +31,22 @@ class GalleryIndexParserTest {
         assertThatThrownBy(() -> parser.parse("{kein json"))
                 .isInstanceOf(GalleryStorageException.class);
     }
+
+    @Test
+    void indexOhnePaketlisteWirdAlsSpeicherfehlerGemeldet() {
+        assertThatThrownBy(() -> parser.parse("{\"photos\":[]}"))
+                .isInstanceOf(GalleryStorageException.class);
+    }
+
+    @Test
+    void fotoOhneKennungWirdAlsSpeicherfehlerGemeldet() {
+        assertThatThrownBy(() -> parser.parse("{\"photos\":[{\"file\":\"a.jpg\"}],\"zips\":[]}"))
+                .isInstanceOf(GalleryStorageException.class);
+    }
+
+    @Test
+    void paketOhneArtWirdAlsSpeicherfehlerGemeldet() {
+        assertThatThrownBy(() -> parser.parse("{\"photos\":[],\"zips\":[{\"name\":\"a.zip\",\"bytes\":1}]}"))
+                .isInstanceOf(GalleryStorageException.class);
+    }
 }

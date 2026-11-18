@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Begrenzt Login-Versuche pro Client-IP in einem festen Zeitfenster (im Speicher). */
+/**
+ * Begrenzt fehlgeschlagene Login-Versuche pro Client-IP in einem festen Zeitfenster (im Speicher).
+ * Erfolgreiche Logins zaehlen nicht: Viele Gaeste teilen sich oft eine IP (Hotel-WLAN, Mobilfunk-NAT).
+ */
 @Service
 public class LoginRateLimiter {
 
@@ -23,20 +26,24 @@ public class LoginRateLimiter {
         this.clock = clock;
     }
 
-    /**
-     * Zaehlt einen Versuch. Liefert die Wartezeit, wenn das Limit erreicht ist, sonst leer.
-     */
-    public Optional<Duration> registerAttempt(String clientIp) {
+    /** Liefert die Wartezeit, wenn diese IP gesperrt ist, sonst leer. */
+    public Optional<Duration> blockedFor(String clientIp) {
+        Instant now = clock.instant();
+        Window window = windows.get(clientIp);
+        if (window == null || window.isExpiredAt(now) || window.attempts() < MAX_ATTEMPTS_PER_WINDOW) {
+            return Optional.empty();
+        }
+        return Optional.of(Duration.between(now, window.endsAt()));
+    }
+
+    /** Zaehlt einen Fehlversuch dieser IP. */
+    public void registerFailure(String clientIp) {
         Instant now = clock.instant();
         windows.values().removeIf(window -> window.isExpiredAt(now));
-        Window window = windows.compute(clientIp, (ip, existing) -> {
+        windows.compute(clientIp, (ip, existing) -> {
             Window current = (existing == null || existing.isExpiredAt(now)) ? new Window(now, 0) : existing;
             return current.withAttempt();
         });
-        if (window.attempts() > MAX_ATTEMPTS_PER_WINDOW) {
-            return Optional.of(Duration.between(now, window.endsAt()));
-        }
-        return Optional.empty();
     }
 
     private record Window(Instant start, int attempts) {

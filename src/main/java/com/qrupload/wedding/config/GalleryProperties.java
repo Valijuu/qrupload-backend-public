@@ -17,5 +17,12 @@ public record GalleryProperties(@Value(GalleryProperties.PASSWORD_PLACEHOLDER) S
         if (password == null || password.isBlank()) {
             throw new IllegalArgumentException(MISSING_PASSWORD_MESSAGE);
         }
+        // Secrets enden gern auf einen Zeilenumbruch (echo ohne -n), das soll den Login nicht verhindern
+        password = password.strip();
+    }
+
+    @Override
+    public String toString() {
+        return "GalleryProperties[password=***]";
     }
 }

@@ -1,5 +1,7 @@
 package com.qrupload.wedding.gallery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +11,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GalleryExceptionHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GalleryExceptionHandler.class);
 
     static final String UNAVAILABLE_MESSAGE = "Die Galerie ist gerade nicht erreichbar. Bitte spaeter erneut versuchen.";
 
@@ -21,7 +25,8 @@ public class GalleryExceptionHandler {
 
     // Interne Details (Bucket, Endpunkt) gehoeren ins Log, nie in die Antwort
     @ExceptionHandler(GalleryStorageException.class)
-    public ResponseEntity<Map<String, String>> storageUnavailable() {
+    public ResponseEntity<Map<String, String>> storageUnavailable(GalleryStorageException exception) {
+        LOG.error("Galerie-Speicher nicht verfuegbar", exception);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(Map.of(MESSAGE_FIELD, UNAVAILABLE_MESSAGE));
     }

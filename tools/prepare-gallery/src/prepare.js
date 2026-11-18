@@ -3,7 +3,7 @@ import path from 'node:path';
 import { writeAtomically } from './atomic-write.js';
 import { buildZipIfChanged, createIfStale } from './incremental.js';
 import { buildIndex } from './index-json.js';
-import { listOriginals, photoId } from './photos.js';
+import { assertUniqueIds, listOriginals, photoId } from './photos.js';
 import { createMobile, createThumb, VARIANT_EXTENSION } from './variants.js';
 import {
   DEFAULT_MAX_ZIP_BYTES, MOBILE_ZIP_NAME, ZIP_KIND, mobileEntryNames, originalZipName, planOriginalZips,
@@ -25,8 +25,12 @@ function variantPath(outDir, folder, photo) {
 
 async function createVariants(photos, outDir, record) {
   for (const photo of photos) {
-    record(await createIfStale(photo.source.path, variantPath(outDir, FOLDERS.thumbs, photo), createThumb));
-    record(await createIfStale(photo.source.path, variantPath(outDir, FOLDERS.mobile, photo), createMobile));
+    try {
+      record(await createIfStale(photo.source.path, variantPath(outDir, FOLDERS.thumbs, photo), createThumb));
+      record(await createIfStale(photo.source.path, variantPath(outDir, FOLDERS.mobile, photo), createMobile));
+    } catch (error) {
+      throw new Error(`Bild nicht lesbar: ${photo.file} (${error.message})`, { cause: error });
+    }
   }
 }
 
@@ -45,7 +49,11 @@ async function createMobileZip(photos, outDir, zipDir, record) {
     path: variantPath(outDir, FOLDERS.mobile, photo),
     name: names[position],
   }));
-  const manifestEntries = photos.map((photo, position) => ({ name: names[position], size: photo.source.size }));
+  // Der Stand des Handy-ZIPs haengt an den Handy-Dateien, nicht an den Originalen
+  const manifestEntries = await Promise.all(entries.map(async (entry) => {
+    const { size, mtimeMs } = await stat(entry.path);
+    return { name: entry.name, size, modified: mtimeMs };
+  }));
   record(await buildZipIfChanged(entries, path.join(zipDir, MOBILE_ZIP_NAME), manifestEntries));
   return { name: MOBILE_ZIP_NAME, kind: ZIP_KIND.mobile };
 }
@@ -62,6 +70,7 @@ async function writeIndex(outDir, photos, zipDir, zips) {
 export async function prepare({ inputDir, outDir, maxZipBytes = DEFAULT_MAX_ZIP_BYTES }) {
   const originals = await listOriginals(inputDir);
   const photos = originals.map((file) => ({ id: photoId(file.name), file: file.name, source: file }));
+  assertUniqueIds(photos);
   const { report, record } = newReport();
   const zipDir = path.join(outDir, FOLDERS.zips);
 

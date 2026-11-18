@@ -38,11 +38,19 @@ Das System SHALL Objektschlüssel ausschließlich aus der Bucket-Liste bilden un
 
 #### Scenario: Pfadangriff
 - **WHEN** ein Client eine Kennung wie `../geheim` anfordert
-- **THEN** antwortet das System mit HTTP 404 und signiert keinen Link
+- **THEN** antwortet das System mit HTTP 400 oder 404 und signiert keinen Link
 
 ### Requirement: Privater Bucket und keine Geheimnisse in Antworten
 Das System SHALL den Bucket nur mit serverseitigen Zugangsdaten ansprechen. Antworten und Fehler SHALL keine Zugangsdaten und internen Details enthalten.
 
 #### Scenario: Bucket nicht erreichbar
-- **WHEN** der Bucket nicht erreichbar ist
-- **THEN** antwortet das System mit HTTP 502 oder 503 und einer allgemeinen Meldung ohne interne Details
+- **WHEN** der Bucket nicht erreichbar ist und noch kein Index geladen wurde
+- **THEN** antwortet das System mit HTTP 503 und einer allgemeinen Meldung ohne interne Details
+
+#### Scenario: Bucket fällt später aus
+- **WHEN** der Bucket ausfällt, nachdem der Index schon einmal geladen wurde
+- **THEN** liefert das System weiter den zuletzt geladenen Index
+
+#### Scenario: Unvollständiger Index
+- **WHEN** in `index.json` Pflichtfelder fehlen
+- **THEN** antwortet das System mit HTTP 503 statt mit unvollständigen Daten

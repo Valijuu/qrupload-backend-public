@@ -2,6 +2,7 @@ package com.qrupload.wedding.support;
 
 import com.qrupload.wedding.gallery.GalleryIndex;
 import com.qrupload.wedding.gallery.GalleryStorage;
+import com.qrupload.wedding.gallery.GalleryStorageException;
 import com.qrupload.wedding.gallery.Photo;
 import com.qrupload.wedding.gallery.ZipKind;
 import com.qrupload.wedding.gallery.ZipPackage;
@@ -24,10 +25,14 @@ public class FakeGalleryStorage implements GalleryStorage {
 
     private final AtomicInteger indexLoads = new AtomicInteger();
     private volatile Duration lastValidity;
+    private volatile boolean failIndexLoads;
 
     @Override
     public GalleryIndex loadIndex() {
         indexLoads.incrementAndGet();
+        if (failIndexLoads) {
+            throw new GalleryStorageException("Bucket nicht erreichbar (Test)");
+        }
         return INDEX;
     }
 
@@ -41,6 +46,10 @@ public class FakeGalleryStorage implements GalleryStorage {
     public URI presignDownload(String objectKey, Duration validity, String downloadFileName) {
         lastValidity = validity;
         return URI.create(BASE_URL + objectKey + DOWNLOAD_PARAM + downloadFileName);
+    }
+
+    public void failIndexLoads(boolean fail) {
+        this.failIndexLoads = fail;
     }
 
     public int indexLoads() {

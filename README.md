@@ -42,7 +42,7 @@ Alle außer dem Login brauchen das Cookie. Bei Bucket-Problemen antwortet das Ba
 
 ## Fotos vorbereiten und hochladen
 
-Das Skript `tools/prepare-gallery` (Node 20+) erzeugt Vorschaubilder (400 px), Handy-Versionen (2560 px, JPEG 85), ZIP-Pakete (ca. 1 GB, plus `handy.zip`) und die `index.json`. Es lässt die Originale unverändert und ist wiederholbar: Ein zweiter Lauf erzeugt und lädt nichts doppelt.
+Das Skript `tools/prepare-gallery` (Node 20+) erzeugt Vorschaubilder (400 px), Handy-Versionen (2560 px, JPEG 85), ZIP-Pakete (ca. 1 GB, plus `handy.zip`) und die `index.json`. Es lässt die Originale unverändert und ist wiederholbar: Ein zweiter Lauf erzeugt nichts neu, rclone überspringt Unverändertes. Hochgeladen werden nur die Bilddateien des Fotoordners (ohne Unterordner), `index.json` kommt als letzter Schritt. HEIC- und RAW-Dateien werden übersprungen, bitte vorher als JPEG exportieren.
 
 ```bash
 cd tools/prepare-gallery
@@ -54,10 +54,24 @@ node src/cli.js /pfad/zu/den/fotos /pfad/zum/ausgabeordner --remote r2:hochzeit
 
 ## Betrieb auf Cloud Run
 
-- Container bauen: `docker build -t qrupload-backend .`
+- Container bauen und bereitstellen, z. B.:
+
+  ```bash
+  gcloud run deploy qrupload-backend --source . --region europe-west3 \
+    --max-instances 2 --allow-unauthenticated \
+    --set-secrets JWT_SECRET=jwt-secret:latest,GALLERY_PASSWORD=gallery-password:latest,GALLERY_STORAGE_ACCESS_KEY=r2-access-key:latest,GALLERY_STORAGE_SECRET_KEY=r2-secret-key:latest \
+    --set-env-vars GALLERY_STORAGE_ENDPOINT=https://<konto>.r2.cloudflarestorage.com,GALLERY_STORAGE_BUCKET=<bucket>
+  ```
+
 - `--max-instances` klein halten (z. B. 2), weil das Login-Limit im Speicher liegt.
+- `--allow-unauthenticated` ist nötig, damit Firebase Hosting den Dienst erreicht. Jeder Endpunkt außer dem Login prüft selbst die Sitzung.
 - Das Frontend (Firebase Hosting) leitet `/api/**` per Rewrite an diesen Dienst weiter. So liegt alles auf einer Domain, und das Cookie funktioniert auch in Safari. CORS ist deshalb nicht nötig.
 - Der Rewrite reicht nur das Cookie `__session` durch. Der Name ist daher fest.
+
+## Nach dem Anlass
+
+- `GALLERY_PASSWORD` **und** `JWT_SECRET` rotieren: Ein neues Passwort allein beendet laufende Sitzungen nicht.
+- Oder den Bucket und den Dienst ganz löschen.
 
 ## Bekannte Einschränkung
 

@@ -1,4 +1,5 @@
 import { parseArgs } from 'node:util';
+import { BYTES_PER_MB, parseMaxZipMb } from './options.js';
 import { prepare } from './prepare.js';
 import { rcloneCommands, runRclone } from './upload.js';
 import { DEFAULT_MAX_ZIP_BYTES } from './zips.js';
@@ -8,7 +9,6 @@ const USAGE = `Aufruf: node src/cli.js <fotoordner> <ausgabeordner> [--remote r2
 Erzeugt Thumbnails, Handy-Versionen, ZIP-Pakete und index.json im Ausgabeordner.
 Mit --remote laedt rclone anschliessend alles in den Bucket (Zugangsdaten stehen in der rclone-Konfiguration).`;
 
-const BYTES_PER_MB = 1_000_000;
 const EXPECTED_POSITIONAL_COUNT = 2;
 const USAGE_ERROR_EXIT_CODE = 1;
 const MAX_ZIP_MB_OPTION = 'max-zip-mb';
@@ -28,7 +28,14 @@ if (positionals.length !== EXPECTED_POSITIONAL_COUNT) {
 }
 
 const [inputDir, outDir] = positionals;
-const report = await prepare({ inputDir, outDir, maxZipBytes: Number(values[MAX_ZIP_MB_OPTION]) * BYTES_PER_MB });
+let maxZipBytes;
+try {
+  maxZipBytes = parseMaxZipMb(values[MAX_ZIP_MB_OPTION]);
+} catch (error) {
+  console.error(error.message);
+  process.exit(USAGE_ERROR_EXIT_CODE);
+}
+const report = await prepare({ inputDir, outDir, maxZipBytes });
 console.log(`Fertig: ${report.created} neu erzeugt, ${report.skipped} unveraendert uebersprungen.`);
 
 if (values.remote) {

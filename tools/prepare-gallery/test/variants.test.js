@@ -31,3 +31,8 @@ test('EXIF-Drehung wird beruecksichtigt (Hochformat bleibt Hochformat)', async (
   const rotated = { width: 4000, height: 3000, orientation: EXIF_ROTATED_90 };
   assert.deepEqual(await variantDimensions(createThumb, rotated), { width: 300, height: 400 });
 });
+
+test('EXIF-Drehung gilt auch fuer die Handy-Version', async () => {
+  const rotated = { width: 4000, height: 3000, orientation: EXIF_ROTATED_90 };
+  assert.deepEqual(await variantDimensions(createMobile, rotated), { width: 1920, height: 2560 });
+});

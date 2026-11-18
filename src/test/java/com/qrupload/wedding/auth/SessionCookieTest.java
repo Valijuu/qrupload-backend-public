@@ -19,6 +19,7 @@ import static com.qrupload.wedding.support.TestValues.PASSWORD;
 import static com.qrupload.wedding.support.TestValues.PROTECTED_PATH;
 import static com.qrupload.wedding.support.TestValues.SESSION_COOKIE;
 import static com.qrupload.wedding.support.TestValues.loginRequest;
+import static com.qrupload.wedding.support.TestValues.uniqueIp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @GalleryTest
 class SessionCookieTest {
 
-    private static final String LOGIN_IP = "10.2.0.1";
     private static final Duration MIN_LIFETIME = Duration.ofHours(1);
     private static final Duration MAX_LIFETIME = Duration.ofHours(12);
     private static final Duration ISSUED_BEFORE_EXPIRATION = Duration.ofSeconds(1);
@@ -38,7 +38,7 @@ class SessionCookieTest {
     private MockMvc mockMvc;
 
     private String loginSetCookie() throws Exception {
-        MvcResult result = mockMvc.perform(loginRequest(LOGIN_IP, PASSWORD)).andReturn();
+        MvcResult result = mockMvc.perform(loginRequest(uniqueIp(), PASSWORD)).andReturn();
         return result.getResponse().getHeader(HttpHeaders.SET_COOKIE);
     }
 

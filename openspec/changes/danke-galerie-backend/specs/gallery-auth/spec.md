@@ -34,12 +34,16 @@ Das Cookie `__session` SHALL ein signiertes JWT mit begrenzter Laufzeit enthalte
 - **THEN** antwortet das System auf geschützte Endpunkte mit HTTP 401
 
 ### Requirement: Begrenzung der Login-Versuche
-Das System SHALL Login-Versuche pro Client-IP auf 5 pro Minute begrenzen und darüber hinaus mit HTTP 429 und `Retry-After` antworten.
+Das System SHALL fehlgeschlagene Login-Versuche pro Client-IP auf 5 pro Minute begrenzen und danach mit HTTP 429 und `Retry-After` antworten. Erfolgreiche Logins SHALL nicht zählen, weil sich viele Gäste eine IP teilen können (Hotel-WLAN, Mobilfunk-NAT).
 
 #### Scenario: Zu viele Fehlversuche
 - **WHEN** eine IP mehr als 5 Login-Versuche innerhalb einer Minute macht
 - **THEN** antwortet das System mit HTTP 429
 - **AND** prüft das Passwort für diese Anfragen nicht mehr
+
+#### Scenario: Viele Gäste hinter einer IP
+- **WHEN** von einer IP innerhalb einer Minute mehr als 5 erfolgreiche Logins kommen
+- **THEN** werden alle angenommen
 
 #### Scenario: Begrenzung läuft ab
 - **WHEN** nach einer Sperre die Minute abgelaufen ist

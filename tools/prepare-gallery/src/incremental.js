@@ -29,11 +29,11 @@ export async function createIfStale(source, target, create) {
 }
 
 function manifestOf(entries) {
-  const lines = entries.map((entry) => `${entry.name}${MANIFEST_FIELD_SEPARATOR}${entry.size}`);
+  const lines = entries.map((entry) => [entry.name, entry.size, entry.modified].join(MANIFEST_FIELD_SEPARATOR));
   return createHash(HASH_ALGORITHM).update(lines.join(MANIFEST_LINE_SEPARATOR)).digest(HASH_ENCODING);
 }
 
-/** Baut das ZIP nur neu, wenn es fehlt oder sich die Dateiliste (Namen und Groessen) geaendert hat. */
+/** Baut das ZIP nur neu, wenn es fehlt oder sich eine Datei (Name, Groesse, Aenderungszeit) geaendert hat. */
 export async function buildZipIfChanged(entries, target, manifestEntries) {
   const manifestFile = `${target}${MANIFEST_SUFFIX}`;
   const manifest = manifestOf(manifestEntries);

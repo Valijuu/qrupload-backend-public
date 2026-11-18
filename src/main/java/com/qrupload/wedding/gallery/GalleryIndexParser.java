@@ -1,10 +1,9 @@
 package com.qrupload.wedding.gallery;
 
-import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
-@Component
+/** Liest index.json; fehlende Pflichtfelder gelten wie kaputtes JSON als Speicherfehler. */
 public class GalleryIndexParser {
 
     static final String UNREADABLE_INDEX_MESSAGE = "Galerie-Index ist nicht lesbar";

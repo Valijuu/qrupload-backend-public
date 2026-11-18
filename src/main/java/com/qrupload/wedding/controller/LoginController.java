@@ -40,11 +40,13 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<Void> login(@RequestBody(required = false) LoginRequest request,
                                       HttpServletRequest httpRequest) {
-        Optional<Duration> retryAfter = rateLimiter.registerAttempt(clientIpResolver.resolve(httpRequest));
+        String clientIp = clientIpResolver.resolve(httpRequest);
+        Optional<Duration> retryAfter = rateLimiter.blockedFor(clientIp);
         if (retryAfter.isPresent()) {
             return tooManyAttempts(retryAfter.get());
         }
         if (request == null || !passwordVerifier.matches(request.password())) {
+            rateLimiter.registerFailure(clientIp);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.noContent()
