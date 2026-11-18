@@ -28,7 +28,7 @@
 
 - [x] 5.1 Dockerfile und Cloud-Run-Konfiguration (Secrets `JWT_SECRET`, `GALLERY_PASSWORD`, R2-Zugangsdaten, `max-instances` 2); Verifikation: Container startet lokal mit Beispielwerten
 - [x] 5.2 README und `CHANGELOG.md` aktualisieren; Verifikation: README beschreibt Variablen, Skript und Deployment
-- [ ] 5.3 Ende-zu-Ende-Prüfung mit dem Frontend (Login, Liste, Vorschau, Download) gegen einen Test-Bucket
+- [x] 5.3 Ende-zu-Ende-Prüfung mit dem Frontend (Login, Liste, Vorschau, Download) gegen einen Test-Bucket
 
 ## Workflow follow-up
 
