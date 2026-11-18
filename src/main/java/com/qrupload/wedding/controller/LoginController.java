@@ -41,14 +41,14 @@ public class LoginController {
     public ResponseEntity<Void> login(@RequestBody(required = false) LoginRequest request,
                                       HttpServletRequest httpRequest) {
         String clientIp = clientIpResolver.resolve(httpRequest);
-        Optional<Duration> retryAfter = rateLimiter.blockedFor(clientIp);
+        Optional<Duration> retryAfter = rateLimiter.tryAcquire(clientIp);
         if (retryAfter.isPresent()) {
             return tooManyAttempts(retryAfter.get());
         }
         if (request == null || !passwordVerifier.matches(request.password())) {
-            rateLimiter.registerFailure(clientIp);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        rateLimiter.release(clientIp);
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, cookieFactory.create(GUEST_SUBJECT).toString())
                 .build();

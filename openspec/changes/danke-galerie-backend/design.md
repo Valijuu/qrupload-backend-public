@@ -23,7 +23,7 @@ Das Backend ist Spring Boot 4 (Java 17). Aktuell: `AuthController` prüft ein QR
 - **Passwortvergleich:** `MessageDigest.isEqual` auf den Bytes (konstante Zeit).
 - **Bucket-Zugriff:** AWS SDK v2 `S3Client` und `S3Presigner` gegen den R2-Endpunkt (S3-kompatibel). Die Objektliste wird beim Start geladen und kurz zwischengespeichert (z. B. 10 Minuten), damit nicht jede Anfrage den Bucket listet. Alternative: Index-Datei `index.json`, die das Skript erzeugt, noch einfacher und schneller; **Entscheidung: `index.json`** im Bucket, vom Skript geschrieben, vom Backend gelesen und zwischengespeichert.
 - **Cache bei Ausfall:** Der zuletzt geladene Index bleibt sichtbar, ein neuer Versuch erst nach 30 Sekunden; S3-Aufrufe haben eine Zeitgrenze von 10 Sekunden. So stauen sich Anfragen nicht an einem hängenden Bucket.
-- **Rate-Limit zählt nur Fehlversuche:** Gäste teilen sich oft eine IP; erfolgreiche Logins zu zählen, würde sie aussperren.
+- **Rate-Limit reserviert vor der Prüfung:** Jeder Versuch wird atomar reserviert, bevor das Passwort geprüft wird, sonst überschreiten parallele Anfragen das Limit. Ein erfolgreicher Login gibt seinen Versuch wieder frei, denn Gäste teilen sich oft eine IP und würden sonst ausgesperrt.
 - **Signierte Links:** 5 Minuten Gültigkeit, nur GET, `Content-Disposition: attachment` für Originale und ZIPs.
 - **Skript:** Node-Skript `tools/prepare-gallery` mit `sharp` für Bilder und `yazl` für ZIPs (ohne Abhängigkeiten; `archiver` zog Pakete mit bekannten Schwachstellen nach), Upload per `rclone` mit `index.json` als letztem Schritt. Alternative: Bash mit ImageMagick, verworfen (EXIF-Rotation, Wiederholbarkeit und Tests sind in Node einfacher).
 
@@ -38,4 +38,4 @@ Das Backend ist Spring Boot 4 (Java 17). Aktuell: `AuthController` prüft ein QR
 
 ## Migration Plan
 
-Neue Endpunkte und Secrets auf Cloud Run einrichten, Frontend-Rewrite setzen, dann das alte Token-Login entfernen. Rückfall: vorherige Cloud-Run-Revision aktivieren.
+Neue Endpunkte und Secrets auf Cloud Run einrichten, Frontend-Rewrite setzen, dann das alte Token-Login entfernen. Rückfall: Frontend und Backend zusammen zurücknehmen. Das neue Frontend ruft `POST /api/login` auf, die alte Revision erwartet `/api/auth/validate` mit Header. Also die passende Frontend-Version in Firebase Hosting zurückholen und die alte Revision samt Konfiguration (`ACCESS_TOKEN`) bis zum Ende des Rückfallfensters behalten.

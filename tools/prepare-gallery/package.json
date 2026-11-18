@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Erzeugt Thumbnails, Handy-Versionen, ZIP-Pakete und index.json fuer die Hochzeitsgalerie und laedt sie per rclone in den Bucket.",
   "scripts": {
-    "test": "node --test test/*.test.js",
+    "test": "node --test",
     "prepare-gallery": "node src/cli.js"
   },
   "engines": {

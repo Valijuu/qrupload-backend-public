@@ -10,13 +10,14 @@ const RCLONE_COPY_FILE = 'copyto';
 const RCLONE_PROGRESS_FLAG = '--progress';
 const CREDENTIAL_MARKERS = ['://', '@'];
 const SUCCESS_EXIT_CODE = 0;
-// Zwischenstaende abgebrochener Laeufe und Hilfsdateien gehoeren nicht in den Bucket
-const LOCAL_ONLY_PATTERNS = ['*.part', '*.manifest'];
+// Nur diese Ergebnisse gehoeren in den Bucket: keine Zwischenstaende (*.part), Hilfsdateien (*.manifest)
+// oder fremde Dateien, die im Ausgabeordner liegen. index.json folgt als letzter Schritt.
+const RESULT_PATTERNS = ['thumbs/*.jpg', 'mobile/*.jpg', 'zips/*.zip'];
 
 /**
  * Die rclone-Aufrufe in dieser Reihenfolge:
  * 1. nur die Bilddateien aus dem Fotoordner (keine Unterordner, keine anderen Dateien) nach originals/,
- * 2. Vorschaubilder, Handy-Versionen und ZIPs,
+ * 2. nur Vorschaubilder, Handy-Versionen und ZIPs aus dem Ausgabeordner,
  * 3. zuletzt index.json, damit das Backend nur Eintraege zeigt, deren Dateien schon oben sind.
  */
 export function rcloneCommands({ inputDir, outDir, remote }) {
@@ -26,8 +27,7 @@ export function rcloneCommands({ inputDir, outDir, remote }) {
   return [
     [RCLONE_COPY, inputDir, `${remote}/${ORIGINALS_FOLDER}`,
       '--max-depth', '1', '--ignore-case', '--include', `*.{${IMAGE_EXTENSION_NAMES.join(',')}}`],
-    [RCLONE_COPY, outDir, remote,
-      ...[INDEX_FILE, ...LOCAL_ONLY_PATTERNS].flatMap((pattern) => ['--exclude', pattern])],
+    [RCLONE_COPY, outDir, remote, ...RESULT_PATTERNS.flatMap((pattern) => ['--include', pattern])],
     [RCLONE_COPY_FILE, path.join(outDir, INDEX_FILE), `${remote}/${INDEX_FILE}`],
   ];
 }

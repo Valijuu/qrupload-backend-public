@@ -37,6 +37,10 @@ Das Skript SHALL die Ergebnisse unter `originals/`, `thumbs/`, `mobile/` und `zi
 - **WHEN** im Fotoordner auch andere Dateien oder Unterordner liegen
 - **THEN** lädt das Skript nur die Bilddateien des Ordners hoch, ohne Zwischen- und Hilfsdateien
 
+#### Scenario: Nur der aktuelle Stand
+- **WHEN** im Ausgabeordner Reste früherer Läufe oder fremde Dateien liegen
+- **THEN** werden Reste entfernt und fremde Dateien nicht hochgeladen
+
 #### Scenario: index.json zuletzt
 - **WHEN** das Skript hochlädt
 - **THEN** lädt es `index.json` erst, nachdem alle Bilder und Pakete oben sind

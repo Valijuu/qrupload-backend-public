@@ -103,3 +103,19 @@ test('eine kaputte Bilddatei nennt den Dateinamen', async () => {
 
   await assert.rejects(prepare({ inputDir, outDir, maxZipBytes: SMALL_ZIP_LIMIT }), /kaputt\.jpg/);
 });
+
+test('Reste frueherer Laeufe (entfernte Fotos, alte Pakete) werden im Ausgabeordner aufgeraeumt', async () => {
+  const { inputDir, outDir } = await setup();
+  await prepare({ inputDir, outDir, maxZipBytes: SMALL_ZIP_LIMIT });
+  await writeFile(path.join(outDir, 'zips', 'originale-9.zip'), 'alt');
+  await writeFile(path.join(outDir, 'zips', 'originale-9.zip.manifest'), 'alt');
+  await writeFile(path.join(outDir, 'thumbs', 'deadbeef.jpg'), 'alt');
+  await writeFile(path.join(outDir, 'mobile', 'deadbeef.jpg'), 'alt');
+
+  await prepare({ inputDir, outDir, maxZipBytes: SMALL_ZIP_LIMIT });
+
+  assert.ok(!(await readdir(path.join(outDir, 'zips'))).includes('originale-9.zip'));
+  assert.ok(!(await readdir(path.join(outDir, 'zips'))).includes('originale-9.zip.manifest'));
+  assert.ok(!(await readdir(path.join(outDir, 'thumbs'))).includes('deadbeef.jpg'));
+  assert.ok(!(await readdir(path.join(outDir, 'mobile'))).includes('deadbeef.jpg'));
+});

@@ -13,11 +13,12 @@ test('Originale: nur Bilddateien aus dem Fotoordner selbst, keine Unterordner', 
   assert.equal(include, '*.{jpg,jpeg,png,webp,tif,tiff}');
 });
 
-test('Ergebnisse ohne Zwischen- und Hilfsdateien und ohne index.json', () => {
+test('Ergebnisse: nur Vorschaubilder, Handy-Versionen und ZIPs, keine fremden Dateien', () => {
   const [, results] = commands;
   assert.deepEqual(results.slice(0, 3), ['copy', '/ergebnis', 'r2:hochzeit']);
-  const excluded = results.filter((_, i) => results[i - 1] === '--exclude');
-  assert.deepEqual(excluded.sort(), ['*.manifest', '*.part', 'index.json'].sort());
+  const included = results.filter((_, i) => results[i - 1] === '--include');
+  assert.deepEqual(included.sort(), ['mobile/*.jpg', 'thumbs/*.jpg', 'zips/*.zip'].sort());
+  assert.ok(!results.includes('--exclude'), 'nur positive Liste, kein Ausschluss-Muster das etwas durchlaesst');
 });
 
 test('index.json kommt als letzter Schritt, wenn alle Bilder und Pakete oben sind', () => {

@@ -12,7 +12,14 @@ public class GalleryIndexParser {
 
     public GalleryIndex parse(String json) {
         try {
-            return mapper.readValue(json, GalleryIndex.class);
+            GalleryIndex index = mapper.readValue(json, GalleryIndex.class);
+            if (index == null) {
+                // Das JSON-Literal null ruft den Konstruktor nicht auf und waere sonst ein "leerer" Index
+                throw new GalleryStorageException(UNREADABLE_INDEX_MESSAGE);
+            }
+            return index;
+        } catch (GalleryStorageException e) {
+            throw e;
         } catch (JacksonException e) {
             throw new GalleryStorageException(UNREADABLE_INDEX_MESSAGE, e);
         }

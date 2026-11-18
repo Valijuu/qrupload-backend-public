@@ -1,7 +1,7 @@
-import { mkdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { writeAtomically } from './atomic-write.js';
-import { buildZipIfChanged, createIfStale } from './incremental.js';
+import { buildZipIfChanged, createIfStale, MANIFEST_SUFFIX } from './incremental.js';
 import { buildIndex } from './index-json.js';
 import { assertUniqueIds, listOriginals, photoId } from './photos.js';
 import { createMobile, createThumb, VARIANT_EXTENSION } from './variants.js';
@@ -17,6 +17,24 @@ function newReport() {
   const report = { created: 0, skipped: 0 };
   const record = (wasCreated) => { report[wasCreated ? 'created' : 'skipped'] += 1; };
   return { report, record };
+}
+
+/** Loescht im Ordner alles, was nicht zum aktuellen Stand gehoert (entfernte Fotos, alte ZIP-Aufteilung). */
+async function pruneFolder(folder, expectedNames) {
+  const expected = new Set(expectedNames);
+  for (const name of await readdir(folder)) {
+    if (!expected.has(name)) {
+      await rm(path.join(folder, name), { force: true });
+    }
+  }
+}
+
+async function pruneOutputs(outDir, photos, zips) {
+  const variantNames = photos.map((photo) => `${photo.id}${VARIANT_EXTENSION}`);
+  const zipNames = zips.flatMap((zip) => [zip.name, `${zip.name}${MANIFEST_SUFFIX}`]);
+  await pruneFolder(path.join(outDir, FOLDERS.thumbs), variantNames);
+  await pruneFolder(path.join(outDir, FOLDERS.mobile), variantNames);
+  await pruneFolder(path.join(outDir, FOLDERS.zips), zipNames);
 }
 
 function variantPath(outDir, folder, photo) {
@@ -78,7 +96,9 @@ export async function prepare({ inputDir, outDir, maxZipBytes = DEFAULT_MAX_ZIP_
   await createVariants(photos, outDir, record);
   const originalZips = await createOriginalZips(originals, zipDir, maxZipBytes, record);
   const mobileZip = await createMobileZip(photos, outDir, zipDir, record);
-  await writeIndex(outDir, photos, zipDir, [...originalZips, mobileZip]);
+  const zips = [...originalZips, mobileZip];
+  await pruneOutputs(outDir, photos, zips);
+  await writeIndex(outDir, photos, zipDir, zips);
 
   return report;
 }

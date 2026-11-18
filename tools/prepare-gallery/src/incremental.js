@@ -3,7 +3,7 @@ import { readFile, stat, writeFile } from 'node:fs/promises';
 import { writeAtomically } from './atomic-write.js';
 import { buildZip } from './zips.js';
 
-const MANIFEST_SUFFIX = '.manifest';
+export const MANIFEST_SUFFIX = '.manifest';
 const TEXT_ENCODING = 'utf8';
 const HASH_ALGORITHM = 'sha256';
 const HASH_ENCODING = 'hex';

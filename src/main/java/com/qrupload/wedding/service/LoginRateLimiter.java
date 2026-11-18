@@ -10,8 +10,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Begrenzt fehlgeschlagene Login-Versuche pro Client-IP in einem festen Zeitfenster (im Speicher).
- * Erfolgreiche Logins zaehlen nicht: Viele Gaeste teilen sich oft eine IP (Hotel-WLAN, Mobilfunk-NAT).
+ * Begrenzt Login-Versuche pro Client-IP in einem festen Zeitfenster (im Speicher).
+ * Jeder Versuch wird vor der Passwortpruefung reserviert, sonst koennten parallele Anfragen das
+ * Limit ueberschreiten. Erfolgreiche Logins geben ihren Versuch wieder frei: Viele Gaeste teilen
+ * sich oft eine IP (Hotel-WLAN, Mobilfunk-NAT).
  */
 @Service
 public class LoginRateLimiter {
@@ -26,24 +28,28 @@ public class LoginRateLimiter {
         this.clock = clock;
     }
 
-    /** Liefert die Wartezeit, wenn diese IP gesperrt ist, sonst leer. */
-    public Optional<Duration> blockedFor(String clientIp) {
-        Instant now = clock.instant();
-        Window window = windows.get(clientIp);
-        if (window == null || window.isExpiredAt(now) || window.attempts() < MAX_ATTEMPTS_PER_WINDOW) {
-            return Optional.empty();
-        }
-        return Optional.of(Duration.between(now, window.endsAt()));
-    }
-
-    /** Zaehlt einen Fehlversuch dieser IP. */
-    public void registerFailure(String clientIp) {
+    /** Reserviert einen Versuch. Liefert die Wartezeit, wenn das Limit erreicht ist, sonst leer. */
+    public Optional<Duration> tryAcquire(String clientIp) {
         Instant now = clock.instant();
         windows.values().removeIf(window -> window.isExpiredAt(now));
-        windows.compute(clientIp, (ip, existing) -> {
+        boolean[] granted = {false};
+        Window window = windows.compute(clientIp, (ip, existing) -> {
             Window current = (existing == null || existing.isExpiredAt(now)) ? new Window(now, 0) : existing;
-            return current.withAttempt();
+            if (current.attempts() >= MAX_ATTEMPTS_PER_WINDOW) {
+                return current;
+            }
+            // Die Entscheidung faellt innerhalb der atomaren Operation, nicht danach
+            granted[0] = true;
+            return current.withAttempts(current.attempts() + 1);
         });
+        return granted[0] ? Optional.empty() : Optional.of(Duration.between(now, window.endsAt()));
+    }
+
+    /** Gibt einen reservierten Versuch nach erfolgreichem Login wieder frei. */
+    public void release(String clientIp) {
+        Instant now = clock.instant();
+        windows.computeIfPresent(clientIp, (ip, window) ->
+                window.isExpiredAt(now) || window.attempts() == 0 ? window : window.withAttempts(window.attempts() - 1));
     }
 
     private record Window(Instant start, int attempts) {
@@ -56,8 +62,8 @@ public class LoginRateLimiter {
             return !now.isBefore(endsAt());
         }
 
-        Window withAttempt() {
-            return new Window(start, attempts + 1);
+        Window withAttempts(int newAttempts) {
+            return new Window(start, newAttempts);
         }
     }
 }

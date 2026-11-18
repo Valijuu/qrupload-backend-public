@@ -41,6 +41,10 @@ Das System SHALL fehlgeschlagene Login-Versuche pro Client-IP auf 5 pro Minute b
 - **THEN** antwortet das System mit HTTP 429
 - **AND** prüft das Passwort für diese Anfragen nicht mehr
 
+#### Scenario: Parallele Anfragen
+- **WHEN** von einer IP gleichzeitig viele Login-Versuche eintreffen
+- **THEN** werden höchstens 5 davon auf das Passwort geprüft
+
 #### Scenario: Viele Gäste hinter einer IP
 - **WHEN** von einer IP innerhalb einer Minute mehr als 5 erfolgreiche Logins kommen
 - **THEN** werden alle angenommen

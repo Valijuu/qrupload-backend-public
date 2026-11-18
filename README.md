@@ -63,6 +63,7 @@ node src/cli.js /pfad/zu/den/fotos /pfad/zum/ausgabeordner --remote r2:hochzeit
     --set-env-vars GALLERY_STORAGE_ENDPOINT=https://<konto>.r2.cloudflarestorage.com,GALLERY_STORAGE_BUCKET=<bucket>
   ```
 
+- **Rückfall:** Frontend und Backend gehören zusammen. Wird nur die alte Cloud-Run-Revision aktiviert, funktioniert der Login nicht, weil das Frontend `POST /api/login` aufruft und die alte Revision `/api/auth/validate` mit Header erwartet. Für einen Rückfall also auch die passende Frontend-Version in Firebase Hosting zurückholen (Konsole → Hosting → Versionen → Rollback) und die alte Revision samt ihrer Konfiguration (`ACCESS_TOKEN`) bis zum Ende des Rückfallfensters behalten.
 - `--max-instances` klein halten (z. B. 2), weil das Login-Limit im Speicher liegt.
 - `--allow-unauthenticated` ist nötig, damit Firebase Hosting den Dienst erreicht. Jeder Endpunkt außer dem Login prüft selbst die Sitzung.
 - Das Frontend (Firebase Hosting) leitet `/api/**` per Rewrite an diesen Dienst weiter. So liegt alles auf einer Domain, und das Cookie funktioniert auch in Safari. CORS ist deshalb nicht nötig.
@@ -70,7 +71,7 @@ node src/cli.js /pfad/zu/den/fotos /pfad/zum/ausgabeordner --remote r2:hochzeit
 
 ## Nach dem Anlass
 
-- `GALLERY_PASSWORD` **und** `JWT_SECRET` rotieren: Ein neues Passwort allein beendet laufende Sitzungen nicht.
+- `GALLERY_PASSWORD` **und** `JWT_SECRET` rotieren: Ein neues Passwort allein beendet laufende Sitzungen nicht. Ablauf: neue Secret-Versionen anlegen, eine neue Cloud-Run-Revision mit genau diesen Versionen ausrollen (`--set-secrets ...:<version>`, nicht `latest`), den gesamten Traffic auf sie stellen und getaggte Routen zur alten Revision entfernen. Cloud Run liest Secrets beim Start einer Instanz, eine laufende alte Revision akzeptiert sonst weiter das alte Passwort. Danach prüfen: neues Passwort funktioniert, altes Passwort und ein vorher ausgestelltes Cookie werden abgewiesen.
 - Oder den Bucket und den Dienst ganz löschen.
 
 ## Bekannte Einschränkung

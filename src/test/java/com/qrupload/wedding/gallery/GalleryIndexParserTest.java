@@ -49,4 +49,17 @@ class GalleryIndexParserTest {
         assertThatThrownBy(() -> parser.parse("{\"photos\":[],\"zips\":[{\"name\":\"a.zip\",\"bytes\":1}]}"))
                 .isInstanceOf(GalleryStorageException.class);
     }
+
+    @Test
+    void jsonNullStattIndexWirdAlsSpeicherfehlerGemeldet() {
+        assertThatThrownBy(() -> parser.parse("null")).isInstanceOf(GalleryStorageException.class);
+    }
+
+    @Test
+    void indexMitLeerenListenIstGueltig() {
+        GalleryIndex index = parser.parse("{\"photos\":[],\"zips\":[]}");
+
+        assertThat(index.photos()).isEmpty();
+        assertThat(index.zips()).isEmpty();
+    }
 }
