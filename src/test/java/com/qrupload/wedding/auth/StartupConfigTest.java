@@ -1,5 +1,6 @@
 package com.qrupload.wedding.auth;
 
+import com.qrupload.wedding.support.GalleryTest;
 import com.qrupload.wedding.config.GalleryProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;

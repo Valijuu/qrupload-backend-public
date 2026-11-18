@@ -1,13 +1,14 @@
 package com.qrupload.wedding.auth;
 
+import com.qrupload.wedding.support.GalleryTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.qrupload.wedding.auth.TestValues.PASSWORD;
-import static com.qrupload.wedding.auth.TestValues.loginRequest;
+import static com.qrupload.wedding.support.TestValues.PASSWORD;
+import static com.qrupload.wedding.support.TestValues.loginRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 

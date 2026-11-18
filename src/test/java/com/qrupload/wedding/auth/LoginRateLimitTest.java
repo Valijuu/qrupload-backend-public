@@ -1,5 +1,7 @@
 package com.qrupload.wedding.auth;
 
+import com.qrupload.wedding.support.MutableClock;
+import com.qrupload.wedding.support.GalleryTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -13,9 +15,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.Clock;
 import java.time.Duration;
 
-import static com.qrupload.wedding.auth.TestValues.PASSWORD;
-import static com.qrupload.wedding.auth.TestValues.WRONG_PASSWORD;
-import static com.qrupload.wedding.auth.TestValues.loginRequest;
+import static com.qrupload.wedding.support.TestValues.PASSWORD;
+import static com.qrupload.wedding.support.TestValues.WRONG_PASSWORD;
+import static com.qrupload.wedding.support.TestValues.loginRequest;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

@@ -1,4 +1,4 @@
-package com.qrupload.wedding.auth;
+package com.qrupload.wedding.support;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -7,11 +7,11 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 /** Test-Uhr, die per advance() vorgestellt wird. */
-class MutableClock extends Clock {
+public class MutableClock extends Clock {
 
     private Instant now = Instant.parse("2026-11-20T12:00:00Z");
 
-    void advance(Duration duration) {
+    public void advance(Duration duration) {
         now = now.plus(duration);
     }
 

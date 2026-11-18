@@ -1,17 +1,18 @@
 package com.qrupload.wedding.auth;
 
+import com.qrupload.wedding.support.GalleryTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.qrupload.wedding.auth.TestValues.FORWARDED_FOR_HEADER;
-import static com.qrupload.wedding.auth.TestValues.LOGIN_PATH;
-import static com.qrupload.wedding.auth.TestValues.PASSWORD;
-import static com.qrupload.wedding.auth.TestValues.SESSION_COOKIE;
-import static com.qrupload.wedding.auth.TestValues.WRONG_PASSWORD;
-import static com.qrupload.wedding.auth.TestValues.loginRequest;
+import static com.qrupload.wedding.support.TestValues.FORWARDED_FOR_HEADER;
+import static com.qrupload.wedding.support.TestValues.LOGIN_PATH;
+import static com.qrupload.wedding.support.TestValues.PASSWORD;
+import static com.qrupload.wedding.support.TestValues.SESSION_COOKIE;
+import static com.qrupload.wedding.support.TestValues.WRONG_PASSWORD;
+import static com.qrupload.wedding.support.TestValues.loginRequest;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.Matchers.not;

@@ -25,6 +25,8 @@ Das Backend ist Spring Boot 4 (Java 17). Aktuell: `AuthController` prüft ein QR
 - **Signierte Links:** 5 Minuten Gültigkeit, nur GET, `Content-Disposition: attachment` für Originale und ZIPs.
 - **Skript:** Node-Skript `tools/prepare-gallery` mit `sharp` für Bilder und `archiver` für ZIPs, Upload per `rclone`. Alternative: Bash mit ImageMagick, verworfen (EXIF-Rotation, Wiederholbarkeit und Tests sind in Node einfacher).
 
+- **Format von `index.json` und Objektschlüsseln (Umsetzung):** `{"photos":[{"id","file"}],"zips":[{"name","bytes","kind":"original|mobile"}]}`. Schlüssel im Bucket: `originals/<file>`, `thumbs/<id>.jpg`, `mobile/<id>.jpg`, `zips/<name>`. Kennungen und Namen werden nur gegen den Index aufgelöst. Konfiguration über `GALLERY_STORAGE_ENDPOINT`, `_BUCKET`, `_ACCESS_KEY`, `_SECRET_KEY`.
+
 ## Risks / Trade-offs
 
 - [In-Memory-Limit mit mehreren Instanzen] → `max-instances` klein halten, langes Passwort.

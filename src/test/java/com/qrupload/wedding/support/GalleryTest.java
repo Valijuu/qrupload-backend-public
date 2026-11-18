@@ -1,7 +1,8 @@
-package com.qrupload.wedding.auth;
+package com.qrupload.wedding.support;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,5 +20,6 @@ import java.lang.annotation.Target;
         "gallery.password=" + TestValues.PASSWORD
 })
 @AutoConfigureMockMvc
+@Import(FakeStorageConfig.class)
 public @interface GalleryTest {
 }

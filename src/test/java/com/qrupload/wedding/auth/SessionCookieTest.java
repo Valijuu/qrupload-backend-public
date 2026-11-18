@@ -1,5 +1,6 @@
 package com.qrupload.wedding.auth;
 
+import com.qrupload.wedding.support.GalleryTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
@@ -12,12 +13,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.Duration;
 import java.util.Date;
 
-import static com.qrupload.wedding.auth.TestValues.JWT_SECRET;
-import static com.qrupload.wedding.auth.TestValues.GUEST_SUBJECT;
-import static com.qrupload.wedding.auth.TestValues.PASSWORD;
-import static com.qrupload.wedding.auth.TestValues.PROTECTED_PATH;
-import static com.qrupload.wedding.auth.TestValues.SESSION_COOKIE;
-import static com.qrupload.wedding.auth.TestValues.loginRequest;
+import static com.qrupload.wedding.support.TestValues.JWT_SECRET;
+import static com.qrupload.wedding.support.TestValues.GUEST_SUBJECT;
+import static com.qrupload.wedding.support.TestValues.PASSWORD;
+import static com.qrupload.wedding.support.TestValues.PROTECTED_PATH;
+import static com.qrupload.wedding.support.TestValues.SESSION_COOKIE;
+import static com.qrupload.wedding.support.TestValues.loginRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

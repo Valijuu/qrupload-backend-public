@@ -13,10 +13,10 @@
 
 ## 3. Galerie-Inhalt
 
-- [ ] 3.1 Bucket-Zugriff (`S3Client`, `S3Presigner` für R2, Konfiguration über Umgebung) und Lesen und Zwischenspeichern von `index.json`, mit Test gegen einen Fake
-- [ ] 3.2 `GET /api/gallery` mit Fotos und Paketen, mit Tests für angemeldet und nicht angemeldet
-- [ ] 3.3 `GET /api/photos/{id}/{variant}` und `GET /api/zips/{name}` mit 302 auf signierten Link (5 Minuten, `attachment` für Original und ZIP); Tests inkl. unbekannte Kennung und `../`-Angriff
-- [ ] 3.4 Fehlerbehandlung ohne interne Details (502 oder 503) mit Test
+- [x] 3.1 Bucket-Zugriff (`S3Client`, `S3Presigner` für R2, Konfiguration über Umgebung) und Lesen und Zwischenspeichern von `index.json`, mit Test gegen einen Fake
+- [x] 3.2 `GET /api/gallery` mit Fotos und Paketen, mit Tests für angemeldet und nicht angemeldet
+- [x] 3.3 `GET /api/photos/{id}/{variant}` und `GET /api/zips/{name}` mit 302 auf signierten Link (5 Minuten, `attachment` für Original und ZIP); Tests inkl. unbekannte Kennung und `../`-Angriff
+- [x] 3.4 Fehlerbehandlung ohne interne Details (502 oder 503) mit Test
 
 ## 4. Skript
 
