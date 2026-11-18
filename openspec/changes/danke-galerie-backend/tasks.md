@@ -2,14 +2,14 @@
 
 ## 1. Konfiguration und Sitzung
 
-- [ ] 1.1 `GALLERY_PASSWORD` statt `ACCESS_TOKEN` in `application.properties` und Startprüfung (fehlend oder leer: kein Start), mit Test; Verifikation: Kontext-Test startet nicht ohne Passwort
-- [ ] 1.2 `JwtAuthFilter` liest das Cookie `__session`, Header-Auswertung entfällt; Tests für gültig, abgelaufen, manipuliert und fehlend
+- [x] 1.1 `GALLERY_PASSWORD` statt `ACCESS_TOKEN` in `application.properties` und Startprüfung (fehlend oder leer: kein Start), mit Test; Verifikation: Kontext-Test startet nicht ohne Passwort
+- [x] 1.2 `JwtAuthFilter` liest das Cookie `__session`, Header-Auswertung entfällt; Tests für gültig, abgelaufen, manipuliert und fehlend
 
 ## 2. Login
 
-- [ ] 2.1 `POST /api/login` mit konstantem Passwortvergleich, Cookie mit `HttpOnly`, `Secure`, `SameSite=Lax`, Laufzeit wenige Stunden; Tests für richtig und falsch
-- [ ] 2.2 Login-Rate-Limit (5 pro Minute und IP, `Retry-After`, IP aus `X-Forwarded-For`) mit Tests für Sperre und Ablauf
-- [ ] 2.3 Alten Endpunkt `/api/auth/validate`, `TokenRequest`, `TokenResponse` und CORS-Konfiguration entfernen, nachdem alle Verwendungen geprüft sind; Verifikation: Build und Tests grün
+- [x] 2.1 `POST /api/login` mit konstantem Passwortvergleich, Cookie mit `HttpOnly`, `Secure`, `SameSite=Lax`, Laufzeit wenige Stunden; Tests für richtig und falsch
+- [x] 2.2 Login-Rate-Limit (5 pro Minute und IP, `Retry-After`, IP aus `X-Forwarded-For`) mit Tests für Sperre und Ablauf
+- [x] 2.3 Alten Endpunkt `/api/auth/validate`, `TokenRequest`, `TokenResponse` und CORS-Konfiguration entfernen, nachdem alle Verwendungen geprüft sind; Verifikation: Build und Tests grün
 
 ## 3. Galerie-Inhalt
 

@@ -1,8 +1,10 @@
 package com.qrupload.wedding.filter;
 
 import com.qrupload.wedding.service.JwtService;
+import com.qrupload.wedding.service.SessionCookieFactory;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 
 @Component
@@ -30,11 +33,9 @@ public class JwtAuthFilter extends OncePerRequestFilter { // Filter nur einmal p
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        String token = sessionToken(request);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // "Bearer " abschneiden
-
+        if (token != null) {
             if (jwtService.isValid(token)) {
                 String subject = jwtService.getSubject(token);
 
@@ -45,5 +46,17 @@ public class JwtAuthFilter extends OncePerRequestFilter { // Filter nur einmal p
         }
 
         filterChain.doFilter(request, response); // request weiter durch die Filte-Kette -> zum Controller
+    }
+
+    private String sessionToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        return Arrays.stream(cookies)
+                .filter(cookie -> SessionCookieFactory.COOKIE_NAME.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 }

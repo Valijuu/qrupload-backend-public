@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000L; //24 Stunden
+    // Sitzung gilt wenige Stunden: lang genug fuer einen Galerie-Besuch, kurz genug bei geteiltem Passwort
+    public static final Duration LIFETIME = Duration.ofHours(6);
 
     private final SecretKey secretKey;
 
@@ -21,7 +23,7 @@ public class JwtService {
 
     public String generateToken(String subject) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
+        Date expiryDate = new Date(now.getTime() + LIFETIME.toMillis());
 
         return Jwts.builder()
                 .subject(subject) //claim (sub) token besitzer
