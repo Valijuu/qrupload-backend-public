@@ -29,6 +29,7 @@ test('index.json kommt als letzter Schritt, wenn alle Bilder und Pakete oben sin
 test('jeder Aufruf verzichtet auf die Bucket-Pruefung, die ein Object-Token nicht darf', () => {
   for (const command of commands) {
     assert.ok(command.includes('--s3-no-check-bucket'), command.join(' '));
+    assert.ok(command.includes('--s3-disable-checksum'), command.join(' '));
   }
 });
 
