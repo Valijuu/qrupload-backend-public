@@ -11,9 +11,9 @@ const RCLONE_PROGRESS_FLAG = '--progress';
 // Object-Tokens (nur Lesen/Schreiben im Bucket) duerfen keinen Bucket anlegen; ohne diese Option
 // versucht rclone das vor jedem Upload und scheitert mit 403
 const NO_BUCKET_CHECK_FLAG = '--s3-no-check-bucket';
-// R2 antwortet bei einzelnen Uploads mit HTTP 501 (NotImplemented); ohne Checksum-Header und ohne
-// Multipart-Upload kamen in der Probe keine Fehler mehr
-const R2_COMPAT_FLAGS = ['--s3-disable-checksum', '--s3-use-multipart-uploads=false'];
+// R2 beantwortet den ersten Upload jeder Datei mit HTTP 501 (NotImplemented), rclone wiederholt ihn
+// erfolgreich. Ohne Checksum-Header bleibt der Lauf mit Exit-Code 0 und ohne Abbruch.
+const R2_COMPAT_FLAGS = ['--s3-disable-checksum'];
 const CREDENTIAL_MARKERS = ['://', '@'];
 const SUCCESS_EXIT_CODE = 0;
 // Nur diese Ergebnisse gehoeren in den Bucket: keine Zwischenstaende (*.part), Hilfsdateien (*.manifest)
