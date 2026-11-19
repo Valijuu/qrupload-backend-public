@@ -36,3 +36,23 @@ test('doppelte Kennungen brechen mit beiden Dateinamen ab', () => {
   assert.throws(() => assertUniqueIds([{ id: 'aa', file: 'a.jpg' }, { id: 'aa', file: 'b.jpg' }]), /a\.jpg.*b\.jpg/);
   assert.doesNotThrow(() => assertUniqueIds([{ id: 'aa', file: 'a.jpg' }, { id: 'bb', file: 'b.jpg' }]));
 });
+
+test('listOriginals ordnet nach der Zahl am Ende, auch bei verschiedenen Namensanfaengen', async () => {
+  const dir = await tempDir();
+  for (const name of ['Erste-Einblicke-A-120.jpg', 'A-109.jpg', 'Erste-Einblicke-A-100.jpg', 'A-9.jpg', 'A-10.jpg']) {
+    await writeFile(path.join(dir, name), 'x');
+  }
+
+  assert.deepEqual((await listOriginals(dir)).map((file) => file.name), [
+    'A-9.jpg', 'A-10.jpg', 'Erste-Einblicke-A-100.jpg', 'A-109.jpg', 'Erste-Einblicke-A-120.jpg',
+  ]);
+});
+
+test('listOriginals stellt Dateien ohne Endzahl ans Ende', async () => {
+  const dir = await tempDir();
+  for (const name of ['Titel.jpg', 'A-1.jpg', 'Anfang.jpg']) {
+    await writeFile(path.join(dir, name), 'x');
+  }
+
+  assert.deepEqual((await listOriginals(dir)).map((file) => file.name), ['A-1.jpg', 'Anfang.jpg', 'Titel.jpg']);
+});

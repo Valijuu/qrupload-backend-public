@@ -12,6 +12,7 @@ Alle sichtbaren Änderungen dieses Projekts. Format nach [Keep a Changelog](http
 - Dockerfile für den Betrieb auf Cloud Run.
 
 ### Changed
+- Das Vorbereitungs-Skript ordnet die Fotos nach der Zahl am Ende des Dateinamens.
 - Die Anmeldung läuft nicht mehr über das QR-Token, sondern über ein gemeinsames Passwort (`GALLERY_PASSWORD`).
 
 ### Fixed
