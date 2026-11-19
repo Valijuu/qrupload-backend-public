@@ -98,10 +98,11 @@ class LoginRateLimitTest {
     }
 
     @Test
-    void clientIpKommtAusErstemXForwardedForEintrag() throws Exception {
-        useUpAttempts("10.4.0.6, 203.0.113.9");
-        attempt("10.4.0.6, 198.51.100.7", WRONG_PASSWORD).andExpect(status().isTooManyRequests());
-        attempt("10.4.0.7, 203.0.113.9", PASSWORD).andExpect(status().isNoContent());
+    void gefaelschteEintraegeVorneImHeaderUmgehenDasLimitNicht() throws Exception {
+        useUpAttempts("1.1.1.1, 203.0.113.9");
+        attempt("2.2.2.2, 203.0.113.9", WRONG_PASSWORD).andExpect(status().isTooManyRequests());
+        attempt("3.3.3.3, 203.0.113.9", PASSWORD).andExpect(status().isTooManyRequests());
+        attempt("1.1.1.1, 203.0.113.10", PASSWORD).andExpect(status().isNoContent());
     }
 
     @Test

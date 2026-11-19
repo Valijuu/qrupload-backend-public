@@ -2,6 +2,7 @@ package com.qrupload.wedding.auth;
 
 import com.qrupload.wedding.support.GalleryTest;
 import com.qrupload.wedding.config.GalleryProperties;
+import com.qrupload.wedding.service.ClientIpResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,20 @@ class StartupConfigTest {
     void anwendungStartetNichtBeiLeeremGalleryPassword() {
         runner.withPropertyValues("gallery.password=  ")
                 .run(context -> assertThat(context).hasFailed());
+    }
+
+    @Test
+    void anwendungStartetNichtMitWenigerAlsEinemVertrautenProxy() {
+        runner.withPropertyValues("gallery.password=geheim", "gallery.trusted-proxy-hops=0")
+                .withUserConfiguration(ClientIpResolver.class)
+                .run(context -> assertThat(context).hasFailed());
+    }
+
+    @Test
+    void vertrauteProxysHabenStandardEins() {
+        runner.withPropertyValues("gallery.password=geheim")
+                .withUserConfiguration(ClientIpResolver.class)
+                .run(context -> assertThat(context).hasNotFailed());
     }
 
     @GalleryTest

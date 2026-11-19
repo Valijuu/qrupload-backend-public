@@ -14,5 +14,8 @@ Alle sichtbaren Änderungen dieses Projekts. Format nach [Keep a Changelog](http
 ### Changed
 - Die Anmeldung läuft nicht mehr über das QR-Token, sondern über ein gemeinsames Passwort (`GALLERY_PASSWORD`).
 
+### Fixed
+- Das Login-Limit ließ sich über einen gefälschten `X-Forwarded-For`-Header umgehen. Die Client-IP kommt jetzt von den vertrauten Proxys (`TRUSTED_PROXY_HOPS`).
+
 ### Removed
 - QR-Token-Login (`/api/auth/validate`, `ACCESS_TOKEN`) und die CORS-Freigabe.

@@ -81,6 +81,10 @@ tools/r2-check/check-r2.sh r2 <bucket>
 - `GALLERY_PASSWORD` **und** `JWT_SECRET` rotieren: Ein neues Passwort allein beendet laufende Sitzungen nicht. Ablauf: neue Secret-Versionen anlegen, eine neue Cloud-Run-Revision mit genau diesen Versionen ausrollen (`--set-secrets ...:<version>`, nicht `latest`), den gesamten Traffic auf sie stellen und getaggte Routen zur alten Revision entfernen. Cloud Run liest Secrets beim Start einer Instanz, eine laufende alte Revision akzeptiert sonst weiter das alte Passwort. Danach prüfen: neues Passwort funktioniert, altes Passwort und ein vorher ausgestelltes Cookie werden abgewiesen.
 - Oder den Bucket und den Dienst ganz löschen.
 
-## Bekannte Einschränkung
+## Login-Limit und Proxy-Kette
 
-Das Login-Limit nimmt die IP aus dem ersten `X-Forwarded-For`-Eintrag und ist darüber umgehbar, siehe Issue #1.
+Das Login-Limit (5 Versuche pro Minute und IP) zählt pro Client-IP. Sie kommt aus `X-Forwarded-For`, von rechts gezählt: Einträge links der vertrauten Proxys kann der Client selbst setzen und werden ignoriert.
+
+- `TRUSTED_PROXY_HOPS` (Standard `1`) ist die Zahl der vertrauten Proxys vor dem Dienst, also Firebase Hosting und Cloud Run. Werte unter 1 verhindern den Start. Ist der Wert zu klein, teilen sich alle Gäste ein Limit (5 Fehlversuche von irgendwem sperren alle für eine Minute). Ist er zu groß, wird ein vom Client gesetzter Eintrag vertraut und das Limit ist umgehbar.
+- **Vor dem Livegang einmal prüfen:** Nach dem ersten Deployment einen Login über die echte Firebase-URL machen und vorübergehend die Einträge von `X-Forwarded-For` ins Log schreiben (kein Passwort). Die eigene öffentliche IP muss an der Stelle stehen, die `TRUSTED_PROXY_HOPS` von rechts trifft (erwartet: `2`). Danach `--set-env-vars TRUSTED_PROXY_HOPS=<Zahl>` setzen und die Log-Ausgabe wieder entfernen.
+- Es gibt bewusst kein globales Limit über alle IPs, weil damit jemand alle Gäste aussperren könnte. Bei 5 Versuchen pro Minute ist ein langes Passwort (z. B. vier zufällige Wörter) praktisch nicht zu erraten.
