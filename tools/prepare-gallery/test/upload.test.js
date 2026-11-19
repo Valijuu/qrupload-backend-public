@@ -30,6 +30,7 @@ test('jeder Aufruf verzichtet auf die Bucket-Pruefung, die ein Object-Token nich
   for (const command of commands) {
     assert.ok(command.includes('--s3-no-check-bucket'), command.join(' '));
     assert.ok(command.includes('--s3-disable-checksum'), command.join(' '));
+    assert.ok(command.includes('--s3-use-multipart-uploads=false'), command.join(' '));
   }
 });
 
